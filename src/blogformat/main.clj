@@ -52,12 +52,16 @@
           [:p {} "para3"]
           [:p {} "para4"]]))
 
+(defn discard-doc
+  "Aims to make HTML the first tag of the hic structure"
+  [hic]
+  (first (if (= "<!DOCTYPE html>" (first hic)) (rest hic) hic)))
+
 (defn html-prep [html]
-  (let [hiccup (hk/as-hiccup (hk/parse html))
-        html-section (remove newline? (second hiccup))
-        body (vec (remove newline? (nth html-section 3)))]
-    {:html-start (vec (take 2 html-section))
-     :head (vec (remove newline? (nth html-section 2)))
+  (let [hiccup (remove newline? (discard-doc (hk/as-hiccup (hk/parse html))))
+        body (vec (remove newline? (nth hiccup 3)))]
+    {:html-start (vec (take 2 hiccup))
+     :head (vec (remove newline? (nth hiccup 2)))
      :body-start (vec (take 2 body))
      :body-content (vec (drop 2 body))}))
 
@@ -72,6 +76,7 @@
   (html-prep (slurp "text2.html"))
 
   (rewrite (slurp "text2.html"))
+  (rewrite (slurp "text3.html"))
 
   (hc/html (rewrite (slurp "text2.html")))
 
