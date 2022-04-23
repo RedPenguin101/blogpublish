@@ -4,14 +4,16 @@
 
 (def newline? #{"\n" "\n  "})
 (defn heading? [hic-el] (and (coll? hic-el) (#{:h1 :h2 :h3} (first hic-el))))
-(def not-heading? (complement heading?))
+
+(defn footnote-section? [hic-el]
+  (and (coll? hic-el)
+       (= [:section {:class "footnotes"}] (take 2 hic-el))))
+
+(def tufte-section? (every-pred (complement heading?) (complement footnote-section?)))
 
 (def t-section [:div.tufte-section])
 (def main-text [:div.main-text])
 (def sidenotes [:div.sidenotes])
-
-(defn section-collect [hic]
-  (conj t-section (into main-text hic) sidenotes))
 
 (defn side-content? [hic] (some? (#{:figure :image} (first hic))))
 
@@ -24,15 +26,16 @@
     (conj t-section (into main-text main-content) (into sidenotes side-content))))
 
 (defn parse
-  ([hic] (parse [] [hic] 0))
-  ([completed [remaining] itbreak]
+  ([hic] (parse [] hic 0))
+  ([completed remaining itbreak]
    (cond
      (> itbreak 100) :break
      (empty? remaining) completed
-     :else (let [[pre-heading [heading & post-heading]] (split-with not-heading? remaining)
-                 [section & from-next-head] (split-with not-heading? post-heading)]
+     (= 1 (count remaining)) (into completed remaining)
+     :else (let [[pre-heading [heading & post-heading]] (split-with tufte-section? remaining)
+                 [section & from-next-head] (split-with tufte-section? post-heading)]
              (recur (vec (remove empty? (conj completed pre-heading heading (section-collect-and-split section))))
-                    from-next-head
+                    (first from-next-head)
                     (inc itbreak))))))
 
 (comment
@@ -50,7 +53,33 @@
           [:p {} "para2"]
           [:h2 "blah"]
           [:p {} "para3"]
-          [:p {} "para4"]]))
+          [:p {} "para4"]])
+
+  (parse [[:h1 {:id "the-title"} "The title"]
+          [:p {} "para1"]
+          [:p {} "para2"]
+          [:h2 "blah"]
+          [:p {} "para3"]
+          [:p {} "para4"]
+          [:h2 "this has no text after it - corner case"]])
+
+  (parse [[:h1 {:id "the-title"} "The title"]
+          [:p {} "para1"]
+          [:figure]
+          [:p {} "para2"]
+          [:h2 "blah"]
+          [:p {} "para3"]
+          [:image]
+          [:p {} "para4"]
+          [:h2 "this has no text after it - corner case"]])
+
+  (parse [[:h1 {:id "the-title"} "The title"]
+          [:p {} "para1"]
+          [:p {} "para2"]
+          [:h2 "blah"]
+          [:p {} "para3"]
+          [:p {} "para4"]
+          [:section {:class "footnotes"}]]))
 
 (defn discard-doc
   "Aims to make HTML the first tag of the hic structure"
@@ -97,3 +126,8 @@
 
   (tufte-style "text2.html")
   (tufte-style "text3.html"))
+
+;; handling footnotes
+
+(:body-content (html-prep (slurp "rewrite_text3.html")))
+(:body-content (html-prep (slurp "text3.html")))
