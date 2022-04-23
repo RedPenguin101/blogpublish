@@ -67,4 +67,6 @@
 
   (spit "text2_rewritten.html" (hc/html (rewrite (slurp "text2.html"))))
 
+  (tufte-style "text.html")
+  (tufte-style "text2.html")
   (tufte-style "text3.html"))
