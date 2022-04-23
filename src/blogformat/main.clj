@@ -13,6 +13,16 @@
 (defn section-collect [hic]
   (conj t-section (into main-text hic) sidenotes))
 
+(defn side-content? [hic] (some? (#{:figure :image} (first hic))))
+
+(defn divide-content [hic]
+  (let [content (group-by side-content? hic)]
+    [(content false) (content true)]))
+
+(defn section-collect-and-split [hic]
+  (let [[main-content side-content] (divide-content hic)]
+    (conj t-section (into main-text main-content) (into sidenotes side-content))))
+
 (defn parse
   ([hic] (parse [] [hic] 0))
   ([completed [remaining] itbreak]
@@ -21,7 +31,7 @@
      (empty? remaining) completed
      :else (let [[pre-heading [heading & post-heading]] (split-with not-heading? remaining)
                  [section & from-next-head] (split-with not-heading? post-heading)]
-             (recur (vec (remove empty? (conj completed pre-heading heading (section-collect section))))
+             (recur (vec (remove empty? (conj completed pre-heading heading (section-collect-and-split section))))
                     from-next-head
                     (inc itbreak))))))
 
@@ -68,5 +78,17 @@
   (spit "text2_rewritten.html" (hc/html (rewrite (slurp "text2.html"))))
 
   (tufte-style "text.html")
+  (tufte-style "text2.html")
+  (tufte-style "text3.html"))
+
+;; pullng out side content
+
+(comment
+  (def test-hiccup (take 3 (drop 3 (:body-content (html-prep (slurp "text3.html"))))))
+
+  (divide-content test-hiccup)
+
+  (section-collect-and-split test-hiccup)
+
   (tufte-style "text2.html")
   (tufte-style "text3.html"))
