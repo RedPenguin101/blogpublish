@@ -8,7 +8,7 @@ Vestibulum tincidunt pulvinar aliquam. Aliquam in dolor quis diam volutpat sodal
 
 [^2]: Blah blah blah
 
-![image](pp_format.png)
+![image](../../images/pp_format.png)
 
 Vivamus purus nibh, tempus vel elit et, hendrerit pharetra metus. In condimentum eget eros a laoreet. Duis sed erat sollicitudin[^3], volutpat diam at, dapibus purus. Curabitur accumsan, lectus non rhoncus congue, lorem nisl pharetra erat, sit amet scelerisque turpis nisl non diam. Ut vitae ligula congue, maximus magna ac, feugiat erat. Nam iaculis orci convallis lacinia blandit. Curabitur rutrum sapien eu enim consectetur mollis. Pellentesque neque justo, aliquet ut scelerisque pretium, semper a arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Curabitur varius risus a tortor imperdiet feugiat. Suspendisse pretium velit vitae augue venenatis, vel hendrerit mauris dictum. Praesent tincidunt vitae leo sit amet hendrerit. Ut at tincidunt turpis. Morbi sed ullamcorper odio. Nunc pharetra elementum massa, non ultrices tortor feugiat quis.
 

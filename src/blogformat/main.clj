@@ -1,144 +1,158 @@
 (ns blogformat.main
-  (:require [hiccup.core :as hc]
-            [hickory.core :as hk]))
+  (:require [blogformat.footnote-md :as md]
+            [blogformat.html-tufte :as tufte]
+            [hiccup.core :refer [html]]
+            [clojure.java.io :as io]
+            [clojure.java.shell :refer [sh]]
+            [clojure.string :as str]))
 
-(def newline? #{"\n" "\n  "})
 
-;; HTML element type matching
+(def index "./index.html")
+(def books "./books.html")
 
-(defn is-html-type [tags] (fn [hic] (and (coll? hic) (tags (first hic)))))
-(defn is-class? [class] (fn [hic] (= class (:class (second hic)))))
-(def heading? (is-html-type #{:h1 :h2 :h3}))
-(def footnote? (every-pred (is-html-type #{:p}) (is-class? "footnote")))
+(def post-paths {:html     "./html/posts/"
+                 :markdown "./markdown/posts/"})
 
-(def tufte-section? (complement heading?))
+(def book-paths {:html     "./html/books/"
+                 :markdown "./markdown/books/"})
 
-(def t-section [:div.tufte-section])
-(def main-text [:div.main-text])
-(def sidenotes [:div.sidenotes])
+(def css-path "../../css/style.css")
 
-(def side-content? (comp boolean (some-fn (is-html-type #{:figure :image}) footnote?)))
+;;;;;;;;;;;;;;;;;;;;
+;; file operations
+;;;;;;;;;;;;;;;;;;;;
 
-(defn divide-content [hic]
-  (let [content (group-by side-content? hic)]
-    [(content false) (content true)]))
+(defn get-file-paths
+  "Returns a list of all files in a folder"
+  [folder-path]
+  (mapv #(str folder-path %) (str/split-lines (:out (sh "ls" folder-path)))))
 
-(defn section-collect-and-split [hic]
-  (let [[main-content side-content] (divide-content hic)]
-    (conj t-section (into main-text main-content) (into sidenotes side-content))))
+(defn file-first-line [file-path]
+  (with-open [rdr (io/reader file-path)]
+    (first (line-seq rdr))))
 
-(defn parse
-  ([hic] (parse [] hic 0))
-  ([completed remaining itbreak]
-   (cond
-     (> itbreak 100) :break
-     (empty? remaining) completed
-     (= 1 (count remaining)) (into completed remaining)
-     :else (let [[pre-heading [heading & post-heading]] (split-with tufte-section? remaining)
-                 [section & from-next-head] (split-with tufte-section? post-heading)]
-             (recur (vec (remove empty? (conj completed pre-heading heading (section-collect-and-split section))))
-                    (first from-next-head)
-                    (inc itbreak))))))
+(defn move-file [in-path out-path]
+  (sh "mv" in-path out-path))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Post publishing
+;;;;;;;;;;;;;;;;;;;;
+
+(defn preproc-markdown [file-path]
+  (let [out-file-path (str/replace file-path ".md" ".temp")]
+    (spit out-file-path (md/prewrite-markdown (slurp file-path)))
+    out-file-path))
+
+(defn publish-markdown [file-path]
+  (sh "pandoc"
+      file-path "-f" "markdown" "-t" "html" "-s" "--toc" "-c" css-path
+      "-o" (str/replace file-path ".temp" ".html"))
+  (str/replace file-path ".temp" ".html"))
+
+(defn postproc-markdown [file-path]
+  (spit file-path (tufte/tufte-style (slurp file-path)))
+  file-path)
+
+(defn publish! [pub-fn pre-fn post-fn in-folder out-folder]
+  (->> (get-file-paths in-folder)
+       (map pre-fn)
+       (map pub-fn)
+       (map post-fn)
+       (map #(move-file % out-folder))
+       doall))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Index building
+;;;;;;;;;;;;;;;;;;;;
+
+(defn post-title [file-path]
+  (subs (file-first-line file-path) 2))
+
+(defn path-from-html
+  "When given a path to an html file, will attempt
+  to find and return the path to the corresponding
+  mardown or adoc file."
+  [file-path extension folder-paths]
+  (str (extension folder-paths)
+       (str/replace (last (str/split file-path #"/"))
+                    ".html"
+                    (if (= extension :adoc) ".adoc" ".md"))))
+
+(defn get-title [file-path folder-paths]
+  (try (post-title (path-from-html file-path :markdown folder-paths))
+       (catch Exception _
+         (post-title (path-from-html file-path :adoc folder-paths)))))
+
+(defn entry-from-post [raw-paths file-path]
+  (let [filename (last (str/split file-path #"/"))
+        [y m d] (re-seq #"\d+" filename)]
+    {:date (str/join "-" [y m d])
+     :filename filename
+     :title (get-title file-path raw-paths)}))
+
+(defn build-index [entries]
+  [:html
+   [:head
+    [:title "Joe's Blog"]
+    [:link {:rel "icon" :type "image/x-icon" :href "./favicon.ico"}]
+    [:link {:rel "stylesheet" :href "./css/style.css"}]]
+   [:body
+    [:div
+     [:h1 "Joe's Blog"]
+     [:h2 "Other stuff"]
+     [:ul [:li [:a {:href books} "Notes on books"]]]
+     [:h2 "Blog posts"]
+     [:table
+      [:tr [:th "Date"] [:th "Title"]]
+      (for [entry (reverse (sort-by :date entries))]
+        [:tr
+         [:td (:date entry)]
+         [:td [:a {:href (str (:html post-paths) (:filename entry))}
+               (:title entry)]]])]]]])
+
+(defn create-post-index! []
+  (->> (get-file-paths (:html post-paths))
+       (map #(entry-from-post post-paths %))
+       build-index
+       html
+       (spit index)))
+
+(defn entry-from-book [raw-paths file-path]
+  (let [filename (last (str/split file-path #"/"))]
+    {:filename filename
+     :title (get-title file-path raw-paths)}))
+
+(defn book-index [entries]
+  [:html
+   [:head
+    [:title "Book Notes"]
+    [:link {:rel "icon" :type "image/x-icon" :href "./favicon.ico"}]
+    [:link {:rel "stylesheet" :href "./css/style.css"}]]
+   [:body
+    [:div
+     [:h1 "Books"]
+     [:ul
+      (for [entry (sort-by :title entries)]
+        [:li [:a {:href (str (:html book-paths) (:filename entry))}
+              (:title entry)]])]]]])
+
+(defn create-book-index! []
+  (->> (get-file-paths (:html book-paths))
+       (map #(entry-from-book book-paths %))
+       book-index
+       html
+       (spit books)))
+
+(defn -main []
+  (println "Publishing markdown Posts")
+  (publish! publish-markdown preproc-markdown postproc-markdown (:markdown post-paths) (:html post-paths))
+  #_(println "Publishing markdown Books")
+  #_(publish! publish-markdown identity identity (:markdown book-paths) (:html book-paths))
+  (println "Creating Post index")
+  (create-post-index!)
+  #_(println "Creating Book Index")
+  #_(create-book-index!))
 
 (comment
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]])
+  (-main))
 
-  (parse [])
-
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]
-          [:p {} "para2"]])
-
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]
-          [:p {} "para2"]
-          [:h2 "blah"]
-          [:p {} "para3"]
-          [:p {} "para4"]])
-
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]
-          [:p {} "para2"]
-          [:h2 "blah"]
-          [:p {} "para3"]
-          [:p {} "para4"]
-          [:h2 "this has no text after it - corner case"]])
-
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]
-          [:figure]
-          [:p {} "para2"]
-          [:h2 "blah"]
-          [:p {} "para3"]
-          [:image]
-          [:p {} "para4"]
-          [:h2 "this has no text after it - corner case"]])
-
-  (parse [[:h1 {:id "the-title"} "The title"]
-          [:p {} "para1"]
-          [:figure]
-          [:p {} "para2"]
-          [:p {:class "footnote"}]
-          [:h2 "blah"]
-          [:p {} "para3"]
-          [:image]
-          [:p {} "para4"]
-          [:h2 "this has no text after it - corner case"]]))
-
-(defn discard-doc
-  "Aims to make HTML the first tag of the hic structure"
-  [hic]
-  (first (if (= "<!DOCTYPE html>" (first hic)) (rest hic) hic)))
-
-(defn html-prep [html]
-  (let [hiccup (remove newline? (discard-doc (hk/as-hiccup (hk/parse html))))
-        body (vec (remove newline? (nth hiccup 3)))]
-    {:html-start (vec (take 2 hiccup))
-     :head (vec (remove newline? (nth hiccup 2)))
-     :body-start (vec (take 2 body))
-     :body-content (vec (drop 2 body))}))
-
-(defn rewrite [html]
-  (let [{:keys [html-start head body-start body-content]} (html-prep html)]
-    (conj html-start head (into body-start (parse body-content)))))
-
-(defn tufte-style [html-filename]
-  (spit (str "rewrite_" html-filename) (hc/html (rewrite (slurp html-filename)))))
-
-(comment
-  (html-prep (slurp "text2.html"))
-
-  (rewrite (slurp "text2.html"))
-  (rewrite (slurp "text3.html"))
-
-  (hc/html (rewrite (slurp "text2.html")))
-
-  (spit "text2_rewritten.html" (hc/html (rewrite (slurp "text2.html"))))
-
-  (tufte-style "text.html")
-  (tufte-style "text2.html")
-  (tufte-style "text3.html"))
-
-;; pullng out side content
-
-(comment
-  (def test-hiccup (take 3 (drop 3 (:body-content (html-prep (slurp "text3.html"))))))
-
-  (divide-content test-hiccup)
-
-  (section-collect-and-split test-hiccup)
-
-  (tufte-style "text2.html")
-  (tufte-style "text3.html"))
-
-;; handling footnotes
-
-(comment
-  (def test-hiccup2 (:body-content (html-prep (slurp "text4.html"))))
-
-  test-hiccup2
-  (tufte-style "text.html")
-  (tufte-style "text2.html")
-  (tufte-style "text3.html")
-  (tufte-style "text4.html"))

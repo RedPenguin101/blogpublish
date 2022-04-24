@@ -4,21 +4,18 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse quis lacini
 <p class="footnote">1:  This is a footnote</p>
 
 ## A sub-heading
-Vestibulum tincidunt pulvinar aliquam. Aliquam in dolor quis diam volutpat sodales feugiat ut ante. Ut ac lorem a lacus mattis scelerisque.<sup>2</sup> Curabitur nec velit finibus, ultricies metus et, hendrerit ex. Nullam lacinia tincidunt semper. Nam viverra id est et sagittis. Morbi et neque varius, malesuada dolor sit amet, mattis ligula.
-
-<p class="footnote">2:  Blah blah blah</p>
+Vestibulum tincidunt pulvinar aliquam. Aliquam in dolor quis diam volutpat sodales feugiat ut ante. Ut ac lorem a lacus mattis scelerisque. Curabitur nec velit finibus, ultricies metus et, hendrerit ex. Nullam lacinia tincidunt semper. Nam viverra id est et sagittis. Morbi et neque varius, malesuada dolor sit amet, mattis ligula.
 
 ![image](pp_format.png)
 
-Vivamus purus nibh, tempus vel elit et, hendrerit pharetra metus. In condimentum eget eros a laoreet. Duis sed erat sollicitudin<sup>3</sup>, volutpat diam at, dapibus purus. Curabitur accumsan, lectus non rhoncus congue, lorem nisl pharetra erat, sit amet scelerisque turpis nisl non diam. Ut vitae ligula congue, maximus magna ac, feugiat erat. Nam iaculis orci convallis lacinia blandit. Curabitur rutrum sapien eu enim consectetur mollis. Pellentesque neque justo, aliquet ut scelerisque pretium, semper a arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Curabitur varius risus a tortor imperdiet feugiat. Suspendisse pretium velit vitae augue venenatis, vel hendrerit mauris dictum. Praesent tincidunt vitae leo sit amet hendrerit. Ut at tincidunt turpis. Morbi sed ullamcorper odio. Nunc pharetra elementum massa, non ultrices tortor feugiat quis.
+Vivamus purus nibh, tempus vel elit et, hendrerit pharetra metus. In condimentum eget eros a laoreet. Duis sed erat sollicitudin, volutpat diam at, dapibus purus. Curabitur accumsan, lectus non rhoncus congue, lorem nisl pharetra erat, sit amet scelerisque turpis nisl non diam. Ut vitae ligula congue, maximus magna ac, feugiat erat. Nam iaculis orci convallis lacinia blandit. Curabitur rutrum sapien eu enim consectetur mollis. Pellentesque neque justo, aliquet ut scelerisque pretium, semper a arcu. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Curabitur varius risus a tortor imperdiet feugiat. Suspendisse pretium velit vitae augue venenatis, vel hendrerit mauris dictum. Praesent tincidunt vitae leo sit amet hendrerit. Ut at tincidunt turpis. Morbi sed ullamcorper odio. Nunc pharetra elementum massa, non ultrices tortor feugiat quis.
 
-<p class="footnote">3:  Flim flam</p>
 
 ## A second subheading
 
-Vivamus accumsan nulla velit, quis mattis neque convallis eget. Aliquam euismod, eros sit amet vestibulum placerat, felis lacus cursus risus, id feugiat nibh lacus sed velit. Proin ante nisl, efficitur a tristique quis<sup>4</sup>, fringilla quis libero. Praesent sed tortor porta, ultricies lectus id, lacinia odio. Nunc vehicula malesuada tincidunt. Nullam ornare mauris et orci vehicula lobortis. Phasellus id velit non magna sagittis tincidunt. In vitae odio elit. Aenean at interdum diam.
+Vivamus accumsan nulla velit, quis mattis neque convallis eget. Aliquam euismod, eros sit amet vestibulum placerat, felis lacus cursus risus, id feugiat nibh lacus sed velit. Proin ante nisl, efficitur a tristique quis<sup>2</sup>, fringilla quis libero. Praesent sed tortor porta, ultricies lectus id, lacinia odio. Nunc vehicula malesuada tincidunt. Nullam ornare mauris et orci vehicula lobortis. Phasellus id velit non magna sagittis tincidunt. In vitae odio elit. Aenean at interdum diam.
 
-<p class="footnote">4:  foo bar baz</p>
+<p class="footnote">2:  A second footnote</p>
 
 ### This time with another level of nesting
 
