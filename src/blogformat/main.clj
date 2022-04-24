@@ -31,8 +31,9 @@
   (with-open [rdr (io/reader file-path)]
     (first (line-seq rdr))))
 
-(defn move-file [in-path out-path]
-  (sh "mv" in-path out-path))
+(defn move-file [in-path out-folder]
+  (sh "mv" in-path out-folder)
+  in-path)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Post publishing
@@ -45,7 +46,7 @@
 
 (defn publish-markdown [file-path]
   (sh "pandoc"
-      file-path "-f" "markdown" "-t" "html" "-s" "--toc" "-c" css-path
+      file-path "-f" "markdown" "-t" "html" "-s" "-c" css-path
       "-o" (str/replace file-path ".temp" ".html"))
   (str/replace file-path ".temp" ".html"))
 
@@ -53,12 +54,16 @@
   (spit file-path (tufte/tufte-style (slurp file-path)))
   file-path)
 
+(defn cleanup [file-path]
+  (sh "rm" (str/replace file-path ".html" ".temp")))
+
 (defn publish! [pub-fn pre-fn post-fn in-folder out-folder]
   (->> (get-file-paths in-folder)
        (map pre-fn)
        (map pub-fn)
        (map post-fn)
        (map #(move-file % out-folder))
+       (map cleanup)
        doall))
 
 ;;;;;;;;;;;;;;;;;;;;

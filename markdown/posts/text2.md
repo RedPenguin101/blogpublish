@@ -1,4 +1,4 @@
-# The title
+% The title
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse quis lacinia est. Curabitur posuere, orci sit amet dapibus placerat, nibh erat efficitur quam, nec iaculis est augue a diam. Curabitur euismod, libero ut pharetra varius, massa enim imperdiet felis, sed gravida ipsum felis quis tellus. Ut facilisis efficitur risus, sed tristique nisi tempor vel. Nunc leo libero, elementum ut arcu at, consequat tincidunt lorem. Praesent ipsum ante, sagittis non blandit a, condimentum ut felis. Aliquam erat volutpat. Cras faucibus massa eget nisl feugiat, et posuere turpis semper. Phasellus mattis id nisi at volutpat.
 
 ## A sub-heading
