@@ -1,4 +1,5 @@
 (ns blogformat.main
+  (:gen-class)
   (:require [blogformat.footnote-md :as md]
             [blogformat.html-tufte :as tufte]
             [hiccup.core :refer [html]]
@@ -28,7 +29,6 @@
   (mapv #(str folder-path %) (str/split-lines (:out (sh "ls" folder-path)))))
 
 (defn file-first-line [file-path]
-  (println "FFL FILEPATH:" file-path)
   (with-open [rdr (io/reader file-path)]
     (first (line-seq rdr))))
 
@@ -79,22 +79,13 @@
   to find and return the path to the corresponding
   mardown or adoc file."
   [file-path extension folder-paths]
-  (println "PFHTML input:" file-path extension folder-paths)
-  (println "PFHTML Return:" (str (extension folder-paths)
-                                 (str/replace (last (str/split file-path #"/"))
-                                              ".html"
-                                              (if (= extension :adoc) ".adoc" ".md"))))
   (str (extension folder-paths)
        (str/replace (last (str/split file-path #"/"))
                     ".html"
-                    (if (= extension :adoc) ".adoc" ".md"))))
+                    ".md")))
 
 (defn get-title [file-path folder-paths]
-  (println "GT:" file-path)
-
-  (try (post-title (path-from-html file-path :markdown folder-paths))
-       (catch Exception _
-         (post-title (path-from-html file-path :adoc folder-paths)))))
+  (post-title (path-from-html file-path :markdown folder-paths)))
 
 (defn entry-from-post [raw-paths file-path]
   (let [filename (last (str/split file-path #"/"))
@@ -164,7 +155,9 @@
   (println "Creating Post index")
   (create-post-index!)
   (println "Creating Book Index")
-  (create-book-index!))
+  (create-book-index!)
+  (println "DONE")
+  (shutdown-agents))
 
 (comment
   (-main))
