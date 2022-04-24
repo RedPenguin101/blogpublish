@@ -28,6 +28,7 @@
   (mapv #(str folder-path %) (str/split-lines (:out (sh "ls" folder-path)))))
 
 (defn file-first-line [file-path]
+  (println "FFL FILEPATH:" file-path)
   (with-open [rdr (io/reader file-path)]
     (first (line-seq rdr))))
 
@@ -78,12 +79,19 @@
   to find and return the path to the corresponding
   mardown or adoc file."
   [file-path extension folder-paths]
+  (println "PFHTML input:" file-path extension folder-paths)
+  (println "PFHTML Return:" (str (extension folder-paths)
+                                 (str/replace (last (str/split file-path #"/"))
+                                              ".html"
+                                              (if (= extension :adoc) ".adoc" ".md"))))
   (str (extension folder-paths)
        (str/replace (last (str/split file-path #"/"))
                     ".html"
                     (if (= extension :adoc) ".adoc" ".md"))))
 
 (defn get-title [file-path folder-paths]
+  (println "GT:" file-path)
+
   (try (post-title (path-from-html file-path :markdown folder-paths))
        (catch Exception _
          (post-title (path-from-html file-path :adoc folder-paths)))))
@@ -151,13 +159,12 @@
 (defn -main []
   (println "Publishing markdown Posts")
   (publish! publish-markdown preproc-markdown postproc-markdown (:markdown post-paths) (:html post-paths))
-  #_(println "Publishing markdown Books")
-  #_(publish! publish-markdown identity identity (:markdown book-paths) (:html book-paths))
+  (println "Publishing markdown Books")
+  (publish! publish-markdown preproc-markdown postproc-markdown (:markdown book-paths) (:html book-paths))
   (println "Creating Post index")
   (create-post-index!)
-  #_(println "Creating Book Index")
-  #_(create-book-index!))
+  (println "Creating Book Index")
+  (create-book-index!))
 
 (comment
   (-main))
-
