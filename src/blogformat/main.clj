@@ -3,19 +3,21 @@
             [hickory.core :as hk]))
 
 (def newline? #{"\n" "\n  "})
-(defn heading? [hic-el] (and (coll? hic-el) (#{:h1 :h2 :h3} (first hic-el))))
 
-(defn footnote-section? [hic-el]
-  (and (coll? hic-el)
-       (= [:section {:class "footnotes"}] (take 2 hic-el))))
+;; HTML element type matching
 
-(def tufte-section? (every-pred (complement heading?) (complement footnote-section?)))
+(defn is-html-type [tags] (fn [hic] (and (coll? hic) (tags (first hic)))))
+(defn is-class? [class] (fn [hic] (= class (:class (second hic)))))
+(def heading? (is-html-type #{:h1 :h2 :h3}))
+(def footnote? (every-pred (is-html-type #{:p}) (is-class? "footnote")))
+
+(def tufte-section? (complement heading?))
 
 (def t-section [:div.tufte-section])
 (def main-text [:div.main-text])
 (def sidenotes [:div.sidenotes])
 
-(defn side-content? [hic] (some? (#{:figure :image} (first hic))))
+(def side-content? (comp boolean (some-fn (is-html-type #{:figure :image}) footnote?)))
 
 (defn divide-content [hic]
   (let [content (group-by side-content? hic)]
@@ -75,11 +77,14 @@
 
   (parse [[:h1 {:id "the-title"} "The title"]
           [:p {} "para1"]
+          [:figure]
           [:p {} "para2"]
+          [:p {:class "footnote"}]
           [:h2 "blah"]
           [:p {} "para3"]
+          [:image]
           [:p {} "para4"]
-          [:section {:class "footnotes"}]]))
+          [:h2 "this has no text after it - corner case"]]))
 
 (defn discard-doc
   "Aims to make HTML the first tag of the hic structure"
@@ -129,5 +134,11 @@
 
 ;; handling footnotes
 
-(:body-content (html-prep (slurp "rewrite_text3.html")))
-(:body-content (html-prep (slurp "text3.html")))
+(comment
+  (def test-hiccup2 (:body-content (html-prep (slurp "text4.html"))))
+
+  test-hiccup2
+  (tufte-style "text.html")
+  (tufte-style "text2.html")
+  (tufte-style "text3.html")
+  (tufte-style "text4.html"))
