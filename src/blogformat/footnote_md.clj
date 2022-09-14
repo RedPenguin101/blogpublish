@@ -24,8 +24,8 @@
   (str/replace "[^1]: this is a footnote" footnote footnote-html)
   ;; => "<p class=\"footnote\">1:  this is a footnote</p>"
 
-  (spit "markdown/posts/text4_preproc.md"
-        (-> (slurp "markdown/posts/text4.md")
+  (spit "markdown/posts/text3_preproc.md"
+        (-> (slurp "markdown/posts/text3.md")
             (str/replace reference reference-html)
             (str/replace footnote footnote-html)
             #_(str/split-lines))))
