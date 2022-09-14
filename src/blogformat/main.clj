@@ -1,7 +1,7 @@
 (ns blogformat.main
   (:gen-class)
   (:require [blogformat.footnote-md :as md]
-            [blogformat.html-tufte :as tufte]
+            [blogformat.html-post :as html-post]
             [hiccup.core :refer [html]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
@@ -52,7 +52,7 @@
   (str/replace file-path ".temp" ".html"))
 
 (defn postproc-markdown [file-path]
-  (spit file-path (tufte/tufte-style (slurp file-path)))
+  (spit file-path (html-post/rewrite (slurp file-path)))
   file-path)
 
 (defn cleanup [file-path]
@@ -66,6 +66,14 @@
        (map #(move-file % out-folder))
        (map cleanup)
        doall))
+
+(comment
+  ;; For testing individual files
+  ;; (This should probably be more like what the program does TBH)
+  (-> "markdown/posts/text5.md"
+      preproc-markdown
+      publish-markdown
+      postproc-markdown))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Index building
