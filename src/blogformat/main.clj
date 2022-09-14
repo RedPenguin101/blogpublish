@@ -68,6 +68,12 @@
        (map cleanup)
        doall))
 
+(comment
+  (-> "markdown/posts/text4.md"
+      preproc-markdown
+      publish-markdown
+      postproc-markdown))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Index building
 ;;;;;;;;;;;;;;;;;;;;
