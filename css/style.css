@@ -73,20 +73,19 @@ p+p {
   margin-top: 0;
 }
 
+p {
+  margin-bottom: 1em;
+}
+
 ul,
 ol {
   max-width: 26em;
-}
-
-blockquote {
-  max-width: 30em;
 }
 
 li>ul {
   padding-left: 1em;
 }
 
-blockquote,
 dl,
 table,
 pre {
@@ -95,7 +94,10 @@ pre {
 
 blockquote {
   color: #666666;
-  margin: 0;
+  max-width: 29em;
+  margin-top: 10;
+  margin-bottom: 10;
+  margin-left: 0;
   padding-left: 1em;
   border-left: 0.2em #EEE solid;
 }
@@ -154,6 +156,10 @@ pre,
   color: inherit;
 }
 
+pre {
+  max-width: 35em;
+}
+
 code {
   border: 1px solid #EAEAEA;
   margin: 0 2px;
@@ -181,6 +187,10 @@ pre {
   border: 1px solid #CCCCCC;
   overflow: auto;
   padding: 4px 8px;
+}
+
+.sourceCode {
+  max-width: 35em;
 }
 
 div.sourceCode>pre {
