@@ -108,7 +108,7 @@
                         [sample]))
 
 (defn html-prep [html]
-  (let [hiccup (hk/as-hiccup (hk/parse (str/replace html #"\n" "")))]
+  (let [hiccup (hk/as-hiccup (hk/parse html))]
     (first (rest hiccup))))
 
 (defn rewrite [html]
@@ -116,8 +116,6 @@
       html-prep
       inline-footnotes
       hc/html))
-
-
 
 (comment
   (count (html-prep (slurp "markdown/posts/text4_preproc.html")))
@@ -131,6 +129,12 @@
 
   (spit "markdown/posts/text3_pre_and_postproc.html"
         (-> (slurp "markdown/posts/text3_preproc.html")
+            html-prep
+            #_inline-footnotes
+            #_hc/html))
+
+  (spit "markdown/posts/text5_test_comp.html"
+        (-> (slurp "markdown/posts/text5_test.html")
             html-prep
             inline-footnotes
             hc/html))
