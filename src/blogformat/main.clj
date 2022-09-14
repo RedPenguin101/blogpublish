@@ -1,7 +1,6 @@
 (ns blogformat.main
   (:gen-class)
   (:require [blogformat.footnote-md :as md]
-            [blogformat.html-tufte :as tufte]
             [blogformat.html-post :as html-post]
             [hiccup.core :refer [html]]
             [clojure.java.io :as io]
@@ -69,7 +68,9 @@
        doall))
 
 (comment
-  (-> "markdown/posts/text4.md"
+  ;; For testing individual files
+  ;; (This should probably be more like what the program does TBH)
+  (-> "markdown/posts/text5.md"
       preproc-markdown
       publish-markdown
       postproc-markdown))
