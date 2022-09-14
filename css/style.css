@@ -9,21 +9,35 @@ body {
 	text-align: justify;
 }
 
-.tufte-section {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.main-text {
-	flex: 30em;
-	max-width: 30em;
-	margin-right: 3em;
-}
-
-.sidenotes {
+.fnref {
+	vertical-align: baseline;
+	position: relative;
 	font-size: 0.8em;
-	flex: 18em;
-	max-width: 30em;
+	bottom: 1.25ex;
+	font-style: normal;
+}
+
+a.fnref,
+.fnref a {
+	color: #222222;
+	text-decoration: none;
+}
+
+.footnote,
+.figure .caption,
+.aside {
+	font-size: 0.8em;
+	float: right;
+	clear: right;
+	width: 18.75em;
+	margin-left: -18.75em;
+	left: 21.25em;
+	position: relative;
+	line-height: 1.875em;
+	margin-bottom: 1.875em;
+	text-indent: 0em;
+	font-style: normal;
+	text-align: left;
 }
 
 h1,
@@ -54,13 +68,9 @@ p {
 	margin-top: 0;
 }
 
-.main-text p+p {
+p+p {
 	text-indent: 1.5em;
 	margin-top: 0;
-}
-
-.sidenotes>p {
-	margin-bottom: 1em;
 }
 
 ul,

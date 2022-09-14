@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [blogformat.footnote-md :as md]
             [blogformat.html-tufte :as tufte]
+            [blogformat.html-post :as html-post]
             [hiccup.core :refer [html]]
             [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
@@ -52,7 +53,7 @@
   (str/replace file-path ".temp" ".html"))
 
 (defn postproc-markdown [file-path]
-  (spit file-path (tufte/tufte-style (slurp file-path)))
+  (spit file-path (html-post/rewrite (slurp file-path)))
   file-path)
 
 (defn cleanup [file-path]
