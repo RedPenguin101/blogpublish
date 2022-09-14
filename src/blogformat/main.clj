@@ -70,7 +70,7 @@
 (comment
   ;; For testing individual files
   ;; (This should probably be more like what the program does TBH)
-  (-> "markdown/posts/text5.md"
+  (-> "markdown/posts/text5code.md"
       preproc-markdown
       publish-markdown
       postproc-markdown))
