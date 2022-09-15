@@ -196,7 +196,7 @@
   (println "Creating Portfolio Index")
   (create-portfolio-index!)
   (println "DONE")
-  #_(shutdown-agents))
+  (shutdown-agents))
 
 (comment
   (-main))
