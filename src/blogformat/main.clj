@@ -10,12 +10,16 @@
 
 (def index "./index.html")
 (def books "./books.html")
+(def portfolio "./portfolio.html")
 
 (def post-paths {:html     "./html/posts/"
                  :markdown "./markdown/posts/"})
 
 (def book-paths {:html     "./html/books/"
                  :markdown "./markdown/books/"})
+
+(def portfolio-paths {:html     "./html/portfolio/"
+                      :markdown "./markdown/portfolio/"})
 
 (def css-path "../../css/style.css")
 
@@ -155,17 +159,42 @@
        html
        (spit books)))
 
+(defn portfolio-index [entries]
+  [:html
+   [:head
+    [:title "Portfolio"]
+    [:link {:rel "icon" :type "image/x-icon" :href "./favicon.ico"}]
+    [:link {:rel "stylesheet" :href "./css/style.css"}]]
+   [:body
+    [:div
+     [:h1 "Portfolio"]
+     [:ul
+      (for [entry (sort-by :title entries)]
+        [:li [:a {:href (str (:html portfolio-paths) (:filename entry))}
+              (:title entry)]])]]]])
+
+(defn create-portfolio-index! []
+  (->> (get-file-paths (:html portfolio-paths))
+       (map #(entry-from-book portfolio-paths %))
+       portfolio-index
+       html
+       (spit portfolio)))
+
 (defn -main []
   (println "Publishing markdown Posts")
   (publish! publish-markdown preproc-markdown postproc-markdown (:markdown post-paths) (:html post-paths))
   (println "Publishing markdown Books")
   (publish! publish-markdown preproc-markdown postproc-markdown (:markdown book-paths) (:html book-paths))
+  (println "Publishing markdown portfolio")
+  (publish! publish-markdown preproc-markdown postproc-markdown (:markdown portfolio-paths) (:html portfolio-paths))
   (println "Creating Post index")
   (create-post-index!)
   (println "Creating Book Index")
   (create-book-index!)
+  (println "Creating Portfolio Index")
+  (create-portfolio-index!)
   (println "DONE")
-  (shutdown-agents))
+  #_(shutdown-agents))
 
 (comment
   (-main))
