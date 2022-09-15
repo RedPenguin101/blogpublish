@@ -116,7 +116,9 @@
     [:div
      [:h1 "Joe's Blog"]
      [:h2 "Other stuff"]
-     [:ul [:li [:a {:href books} "Notes on books"]]]
+     [:ul
+      [:li [:a {:href books} "Notes on books"]]
+      [:li [:a {:href portfolio} "Portfolio of Software Projects"]]]
      [:h2 "Blog posts"]
      [:table
       [:tr [:th "Date"] [:th "Title"]]
